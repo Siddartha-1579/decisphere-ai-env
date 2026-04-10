@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
-from models import Action, StepResponse, ResetResponse, StateResponse
+from models import Action, StepResponse, ResetResponse, StateResponse, ResetRequest
 from environment import DecisionEnv
 import uvicorn
 import sys
@@ -22,9 +22,15 @@ def read_root():
     return {"status": "ok", "message": "DeciSphere AI Benchmark Server"}
 
 @app.post("/reset", response_model=ResetResponse)
-def reset_env(task_id: str = Query("task1")):
+def reset_env(req: ResetRequest = None, task_id: str = Query(None)):
+    final_task = "task1"
+    if req and req.task_id:
+        final_task = req.task_id
+    elif task_id:
+        final_task = task_id
+        
     try:
-        t_id = int(task_id.replace("task", ""))
+        t_id = int(final_task.replace("task", ""))
     except ValueError:
         t_id = 1
         

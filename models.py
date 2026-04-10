@@ -28,5 +28,8 @@ class ResetResponse(BaseModel):
     observation: Observation
     info: Dict[str, Any]
 
+class ResetRequest(BaseModel):
+    task_id: Optional[str] = "task1"
+
 class StateResponse(BaseModel):
     state: Dict[str, Any]
