@@ -1,0 +1,32 @@
+version: "1.0"
+name: "decisphere-ai"
+description: "Multi-Domain AI Decision Intelligence Benchmark"
+
+environment:
+  entrypoint: "server/app.py"
+  type: "http"
+
+tasks:
+  - id: "task1"
+    name: "Task Prioritization"
+    description: "Agent must prioritize correctly among urgent and important tasks."
+    grader: "tasks/task1/grader.py"
+  - id: "task2"
+    name: "Resource Allocation"
+    description: "Allocate limited budget and staff to competing projects."
+    grader: "tasks/task2/grader.py"
+  - id: "task3"
+    name: "Crisis Management"
+    description: "Resolve dependencies and manage global risk during a crisis."
+    grader: "tasks/task3/grader.py"
+  - id: "task4"
+    name: "Budget Optimization"
+    description: "Maintain balance across various channels with tight budget constraints."
+    grader: "tasks/task4/grader.py"
+  - id: "task5"
+    name: "Escalation Strategy"
+    description: "Properly escalate unresolvable tasks without overloading."
+    grader: "tasks/task5/grader.py"
+
+inference:
+  script: "inference.py"

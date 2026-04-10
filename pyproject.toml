@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "decisphere-ai"
+version = "0.1.0"
+description = "Multi-Domain AI Decision Intelligence Benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "httpx",
+    "openai",
+    "numpy",
+    "openenv-core"
+]
+
+[project.scripts]
+server = "server.app:main"
