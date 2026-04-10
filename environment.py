@@ -22,18 +22,22 @@ class DecisionEnv:
         return self._get_obs()
 
     def _get_obs(self) -> Observation:
-        return Observation(
-            task_id=self.task_id,
-            step_count=self.step_count,
-            resources=self.resources,
-            risk_level=self.risk_level,
-            budget_remaining=self.budget_remaining,
-            time_remaining=self.time_remaining,
-            task_queue=self.task_queue,
-            completed_tasks=self.completed_tasks,
-            missed_deadlines=self.missed_deadlines,
-            escalation_count=self.escalation_count
-        )
+        vec = [
+            float(self.task_id),
+            float(self.step_count),
+            float(self.resources),
+            float(self.risk_level),
+            float(self.budget_remaining),
+            float(self.time_remaining),
+            float(self.completed_tasks),
+            float(self.missed_deadlines),
+            float(self.escalation_count)
+        ] + [float(q) for q in self.task_queue]
+        
+        while len(vec) < 20:
+            vec.append(0.0)
+            
+        return Observation(vector=vec[:20])
 
     def state(self) -> dict:
         return self._get_obs().dict()

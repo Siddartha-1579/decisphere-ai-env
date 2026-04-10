@@ -2,16 +2,7 @@ from typing import Dict, Any, Optional, List
 from pydantic import BaseModel, Field
 
 class Observation(BaseModel):
-    task_id: int
-    step_count: int
-    resources: float
-    risk_level: float
-    budget_remaining: float
-    time_remaining: float
-    task_queue: List[float]
-    completed_tasks: int
-    missed_deadlines: int
-    escalation_count: int
+    vector: List[float]
     # Ensure it is a vector overall size ~14 elements
 
 class Action(BaseModel):
