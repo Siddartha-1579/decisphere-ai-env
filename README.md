@@ -5,8 +5,6 @@ colorFrom: indigo
 colorTo: blue
 sdk: docker
 sdk_version: "latest"
-python_version: "3.10"
-app_file: server/app.py
 pinned: false
 ---
 
