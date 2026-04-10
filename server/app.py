@@ -61,7 +61,7 @@ def main():
     # OpenEnv normally runs python from the root directory but calls "python server/app.py".
     # But let's support both properly by getting the root path:
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    uvicorn.run("server.app:app", host="0.0.0.0", port=8000, reload=False, app_dir=root_dir)
+    uvicorn.run("server.app:app", host="0.0.0.0", port=7860, reload=False, app_dir=root_dir)
 
 if __name__ == "__main__":
     main()

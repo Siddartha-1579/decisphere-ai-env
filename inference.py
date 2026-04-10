@@ -33,7 +33,7 @@ async def run_task(client: AsyncOpenAI, t_idx: int):
 
     try:
         async with httpx.AsyncClient() as http_client:
-            reset_req = await http_client.post(f"http://localhost:8000/reset?task_id={task_name}")
+            reset_req = await http_client.post(f"http://localhost:7860/reset?task_id={task_name}")
             
             done = False
             while not done and step_count < MAX_STEPS:
@@ -46,7 +46,7 @@ async def run_task(client: AsyncOpenAI, t_idx: int):
                 action_str = f"action({action_type})"
                 
                 # Step env
-                step_req = await http_client.post("http://localhost:8000/step", json={
+                step_req = await http_client.post("http://localhost:7860/step", json={
                     "action_type": action_type,
                     "value": val
                 })
