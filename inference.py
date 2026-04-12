@@ -17,18 +17,28 @@ ENV_BENCHMARK = "decisphere-ai"
 def b_str(val: bool) -> str:
     return "true" if val else "false"
 
-async def extract_action_from_llm(client: AsyncOpenAI, prompt: str) -> tuple[int, float]:
+async def extract_action_from_llm(client: AsyncOpenAI, obs_data: dict) -> tuple[int, float]:
     """ Call the OpenAI LLM proxy as required by the validator """
+    system_prompt = "You are an enterprise AI planning agent. Based on the JSON Observation, choose the optimal action ID. Valid actions: 0=prioritize, 1=delay, 2=allocate, 3=ignore, 4=escalate. Return ONLY a JSON object like: {\"action_type\": 2, \"value\": 1.0, \"message\": \"reasoning\"}"
+    user_prompt = f"Observation: {json.dumps(obs_data)}\nChoose your action."
+    
     try:
         response = await client.chat.completions.create(
             model=MODEL_NAME,
-            messages=[{"role": "user", "content": "Return an action integer between 0 and 4"}],
-            max_tokens=10
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=100
         )
+        content = json.loads(response.choices[0].message.content)
+        action_type = int(content.get("action_type", random.randint(0, 4)))
+        val = float(content.get("value", 1.0))
+        return action_type, val
     except Exception as e:
         print(f"Proxy LLM call failed: {e}")
-    action_type = random.randint(0, 4)
-    return action_type, 1.0
+        return random.randint(0, 4), 1.0
 
 async def run_task(client: AsyncOpenAI, t_idx: int):
     task_name = f"task{t_idx}"
@@ -42,15 +52,14 @@ async def run_task(client: AsyncOpenAI, t_idx: int):
     try:
         async with httpx.AsyncClient() as http_client:
             reset_req = await http_client.post(f"http://localhost:7860/reset?task_id={task_name}")
+            obs_data = reset_req.json().get("observation", {}) if reset_req.status_code == 200 else {}
             
             done = False
             while not done and step_count < MAX_STEPS:
                 step_count += 1
                 
-                # Mock LLM API Call
-                # In a real run, you would send observation to client.chat.completions.create(...)
-                # using the observation structure. For pure reproducible baseline:
-                action_type, val = await extract_action_from_llm(client, "dummy prompt")
+                # Real LLM API Call processing the observation
+                action_type, val = await extract_action_from_llm(client, obs_data)
                 action_str = f"action({action_type})"
                 
                 # Step env via POST as standard OpenEnv HTTP target
@@ -63,6 +72,7 @@ async def run_task(client: AsyncOpenAI, t_idx: int):
                     resp_data = step_req.json()
                     rwd = float(resp_data.get("reward", 0.0))
                     done = bool(resp_data.get("done", False))
+                    obs_data = resp_data.get("observation", {})
                 else:
                     rwd = 0.5
                     done = True
