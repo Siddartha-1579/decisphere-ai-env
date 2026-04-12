@@ -11,164 +11,169 @@ pinned: false
 
 ## 🚀 Overview
 
-DeciSphere AI is a **real-world reinforcement learning benchmark environment** designed to evaluate how AI agents make **enterprise-level decisions** under constraints.
+DeciSphere AI is a real-world reinforcement learning benchmark environment designed to evaluate how well AI agents make business-critical decisions under constraints.
 
-Unlike game-based RL environments, this system simulates **practical decision-making scenarios** focusing heavily on **Cascading Risk / Sequential Planning**. It tests an agent's ability to foresee downstream failure points such as:
+Unlike game environments, this system simulates practical enterprise scenarios such as:
 
-* task prioritization
-* resource allocation
-* cascading risk management
-* budget optimization
-* time-sensitive workflows
-* escalation strategies
+📌 Task prioritization
+💰 Resource allocation
+⚠️ Risk & crisis management
+⏳ Time & deadline handling
+🚨 Escalation strategies
 
----
+👉 The goal is to test decision intelligence, not gameplay.
 
-## 🎯 Objective
+## 🎯 Why This Matters
 
-The goal is to build a **deterministic, reproducible evaluation environment** where AI agents are scored based on:
+Modern AI systems struggle with multi-step reasoning under constraints.
 
-* correctness of decisions
-* efficiency (steps taken)
-* risk management
-* overall decision quality
+DeciSphere AI provides a structured environment where agents must:
 
----
+* balance competing priorities
+* manage limited resources
+* reduce risk dynamically
+* make sequential decisions
+
+This mirrors real-world use cases in:
+
+* operations management
+* project planning
+* business strategy systems
+* autonomous decision engines
 
 ## 🧩 Environment Design
 
-The environment follows a Gym-like structure:
+### 🧠 State Representation
 
-```python
-reset() → initializes environment
-step(action) → applies action
-state() → returns current state
-```
+Each step provides a structured state including:
 
-### 🔢 Action Space
-
-Discrete actions:
-
-| ID | Action     |
-| -- | ---------- |
-| 0  | prioritize |
-| 1  | delay      |
-| 2  | allocate   |
-| 3  | ignore     |
-| 4  | escalate   |
-
----
-
-## 📊 State Representation
-
-The environment returns a **fixed-length normalized numeric vector (~20 features)** including:
-
-* task urgency & importance
-* resource availability
-* budget remaining
-* risk level
+* task queue (top 5 tasks)
+* urgency & importance
+* available resources (budget, staff)
+* risk level (0–1)
 * time remaining
+* completed / missed tasks
 * escalation count
-* task queue signals
 
-All values are normalized between **0 and 1**.
+👉 All values are normalized into a fixed numeric vector (~20 features).
 
----
+### 🎮 Action Space
 
-## 🧠 Tasks (Deterministic)
+The agent chooses from 5 actions:
+
+| Action | Meaning |
+| :--- | :--- |
+| 0 | Prioritize task |
+| 1 | Delay task |
+| 2 | Allocate resources |
+| 3 | Ignore task |
+| 4 | Escalate issue |
+
+## 🧪 Tasks (Increasing Difficulty)
 
 ### ✅ Task 1 — Task Prioritization (Easy)
 
-* Input: tasks with urgency & importance scores
-* Rule: deterministic ranking using urgency × importance
-* Goal: select optimal priority order
+Agent must select the most important and urgent tasks.
 
----
+✔️ Tests:
+* urgency vs importance reasoning
+* scheduling decisions
 
-### ⚙️ Task 2 — Resource Allocation (Medium)
+### ⚖️ Task 2 — Resource Allocation (Medium)
 
-* Input: budget + project list (cost, value)
-* Rule: knapsack-like optimal allocation
-* Goal: maximize total value under constraints
+Agent must distribute limited budget and time across projects.
 
----
+✔️ Tests:
+* optimization under constraints
+* trade-off decisions
 
 ### 🔥 Task 3 — Crisis Management (Hard)
 
-* Input: dependency graph + cascading risk
-* Rule: deterministic resolution sequence
-* Goal: minimize global risk while resolving dependencies
+Agent handles cascading failures where decisions impact global risk.
 
----
+✔️ Tests:
+* sequential reasoning
+* dependency handling
+* risk minimization
+
+## 🎯 Reward System
+
+Rewards are dense and structured, encouraging intelligent behavior.
+
+**Positive Signals:**
+* correct decision → +reward
+* task completion → bonus
+* efficient actions → bonus
+
+**Penalties:**
+* increasing risk → penalty
+* delaying urgent tasks → penalty
+* ignoring critical tasks → penalty
+* over-escalation → penalty
+
+👉 Final rewards are strictly clamped between (0, 1) for validator compliance.
+
+## 📊 Example Episode
+Step 1 → Action: Prioritize → Reward: 0.72  
+Step 2 → Action: Allocate → Reward: 0.65  
+Step 3 → Action: Escalate → Reward: 0.81  
+
+Final Score: 0.79
 
 ## 🧮 Grading System
 
-Each task uses a **deterministic programmatic grader**.
-
-Scores are computed using:
+Each task is evaluated using deterministic metrics:
 
 * correctness
 * efficiency
 * decision quality
-* risk handling
+* risk management
 
-### ⚠️ IMPORTANT
+👉 Final score is normalized to (0, 1) for all tasks.
 
-All scores are **strictly bounded within (0, 1)**:
-
-```python
-score = max(0.0001, min(0.9999, score))
-```
-
-This ensures full compatibility with OpenEnv validation.
-
----
-
-## 🎯 Reward System
-
-Rewards are:
-
-* normalized
-* deterministic
-* strictly between (0,1)
-
-Includes:
-
-* correctness reward
-* efficiency bonus
-* risk penalty
-* delay penalty
-* escalation penalty
-
----
+## 🤖 Baseline Agents
+* 🎲 **RandomAgent** — random decisions (control baseline)
+* 📏 **RuleBasedAgent** — heuristic-driven decisions
 
 ## 🌐 API Endpoints
 
-Backend is powered by FastAPI:
+Backend is powered by FastAPI.
 
-### 🔹 Reset Environment
+**Reset Environment**
+`GET /reset`
 
+**Take Action**
+`GET /step/{action}`
+
+## 🧪 Local Testing
+
+Start backend:
 ```bash
-GET /reset
+uvicorn server.app:app --reload --port 7860
 ```
 
-### 🔹 Take Action
-
+Test:
 ```bash
-GET /step/{action}
+curl http://127.0.0.1:7860/reset
+curl http://127.0.0.1:7860/step/0
 ```
 
-### 🔹 Health Check
+## 🧠 Inference System
 
-```bash
-GET /
-```
+The `inference.py` script:
 
----
+* interacts with the API
+* runs multiple steps
+* logs structured outputs
+* evaluates agent performance
 
-## 📦 Project Structure
+## 🐳 Deployment (Hugging Face Spaces)
+* Docker-based deployment
+* Fully reproducible environment
+* API-ready inference
 
-```
+## 📁 Project Structure
+```text
 decision-env/
 ├── environment.py
 ├── grader.py
@@ -176,89 +181,29 @@ decision-env/
 ├── inference.py
 ├── openenv.yaml
 ├── Dockerfile
-├── requirements.txt
+├── README.md
 ├── server/
 │   └── app.py
 ├── tasks/
-│   ├── task1/
-│   ├── task2/
-│   └── task3/
 ```
 
----
+## ✅ OpenEnv Compliance
 
-## 🧪 Inference
+✔️ Deterministic environment
+✔️ Valid reward range (0,1)
+✔️ API endpoints functional
+✔️ Docker builds successfully
+✔️ Inference reproducible
 
-The project includes an `inference.py` script that:
+## 🏁 Conclusion
 
-* interacts with the environment
-* simulates agent decisions
-* logs execution in structured format
+DeciSphere AI is not just an environment — it is a decision intelligence benchmark designed to push AI systems toward real-world reasoning capabilities.
 
-```
-[START]
-[STEP]
-[END]
-```
+It combines:
 
----
+* structured environments
+* multi-domain challenges
+* meaningful reward shaping
+* scalable evaluation
 
-## 🧰 Deployment
-
-### ▶️ Run Locally
-
-Backend:
-
-```bash
-cd server
-uvicorn app:app --reload --port 7860
-```
-
----
-
-### 🤗 Hugging Face Spaces
-
-This project is deployed using:
-
-* **SDK:** Docker
-* **Entry:** Dockerfile
-
----
-
-## 🏆 Benchmark Goal
-
-DeciSphere AI serves as a **scalable evaluation platform** for:
-
-* RL agents
-* rule-based systems
-* LLM-based decision agents
-
-It provides a **real-world benchmark** for measuring AI decision intelligence.
-
----
-
-## 📌 Key Highlights
-
-✅ Deterministic environment
-✅ Multi-domain decision tasks
-✅ Programmatic grading
-✅ Validator-safe scoring
-✅ API-based interaction
-✅ Production-ready design
-
----
-
-## 🔥 Final Note
-
-This project is designed to feel like a **real enterprise AI benchmarking system**, not just a prototype.
-
-It emphasizes:
-
-* reliability
-* reproducibility
-* clarity
-* real-world applicability
-
----
-
-🚀 Built for the **Meta × Hugging Face OpenEnv Hackathon**
+👉 Making it a strong candidate for evaluating next-generation AI decision systems.
