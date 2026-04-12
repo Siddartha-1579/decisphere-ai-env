@@ -52,17 +52,32 @@ def step_env_get(action: int, value: float = Query(0.0)):
     # the info into the requested schema perfectly:
     return {
         "step": env.step_count,
+        "max_steps": 10,
         "total_reward": env.total_reward,
         "risk_level": env.risk_level,
         "budget_remaining": env.budget_remaining,
         "correctness": api_reward, 
+        "escalations_used": env.escalation_count,
         "reward_history": env.reward_history,
+        "action_distribution": {},
+        "task_name": f"task{env.task_id}",
         "done": done
     }
 
 @app.post("/step", response_model=StepResponse)
 def step_env(action: Action):
     obs, reward, done, info = env.step(action.action_type, action.value)
+    info["step"] = env.step_count
+    info["max_steps"] = 10
+    info["total_reward"] = env.total_reward
+    info["risk_level"] = env.risk_level
+    info["budget_remaining"] = env.budget_remaining
+    info["correctness"] = reward
+    info["escalations_used"] = env.escalation_count
+    info["reward_history"] = env.reward_history
+    info["action_distribution"] = {}
+    info["task_name"] = f"task{env.task_id}"
+    
     return StepResponse(observation=obs, reward=reward, done=done, info=info)
 
 @app.get("/state", response_model=StateResponse)
