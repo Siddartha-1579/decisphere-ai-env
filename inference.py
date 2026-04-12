@@ -5,7 +5,7 @@ import json
 import random
 from openai import AsyncOpenAI
 
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7860")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")
 API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY") or "dummy"
 

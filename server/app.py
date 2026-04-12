@@ -59,7 +59,7 @@ def step_env_get(action: int, value: float = Query(0.0)):
         "correctness": api_reward, 
         "escalations_used": env.escalation_count,
         "reward_history": env.reward_history,
-        "action_distribution": {},
+        "action_distribution": [{"name": f"Action {action}", "value": 1}],
         "task_name": f"task{env.task_id}",
         "done": done
     }
@@ -75,7 +75,7 @@ def step_env(action: Action):
     info["correctness"] = reward
     info["escalations_used"] = env.escalation_count
     info["reward_history"] = env.reward_history
-    info["action_distribution"] = {}
+    info["action_distribution"] = [{"name": f"Action {action.action_type}", "value": 1}]
     info["task_name"] = f"task{env.task_id}"
     
     return StepResponse(observation=obs, reward=reward, done=done, info=info)
