@@ -1,5 +1,7 @@
 {
-    "id": "task1",
-    "name": "Task Prioritization",
-    "description": "Agent must prioritize correctly among urgent and important tasks."
+  "name": "Task Prioritization",
+  "description": "Agent must sequentially prioritize tasks using a deterministic formula.",
+  "input": "State vector with task queue urgencies.",
+  "expected_output": "Agent chooses action 0 (prioritize) with 'value' representing the target index, exactly in the optimal order of urgency.",
+  "evaluation_criteria": "Deterministic sequence matching. Perfect order = 0.9999. Minor variance reduces score."
 }

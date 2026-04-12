@@ -1,5 +1,7 @@
 {
-    "id": "task2",
-    "name": "Resource Allocation",
-    "description": "Allocate limited budget and staff to competing projects."
+  "name": "Resource Allocation",
+  "description": "Optimally allocate resources across projects under a fixed budget using knapsack rules.",
+  "input": "State vector showing 5 project costs.",
+  "expected_output": "Agent selects action 2 (allocate) on optimal indices without exceeding budget.",
+  "evaluation_criteria": "Fractional similarity to the mathematically optimal knapsack combination. Perfect = 0.9999."
 }

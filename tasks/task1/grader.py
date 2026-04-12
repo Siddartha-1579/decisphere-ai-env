@@ -1,27 +1,31 @@
-import json
-
 def grade(*args, **kwargs) -> float:
     try:
-        # Expected kwargs: trajectory, state, etc.
-        # But we must be robust against random strings!
         if len(args) > 0 and isinstance(args[0], str):
-            # This is essentially dummy validator data
             return 0.5
-            
         trajectory = kwargs.get('trajectory', [])
         
-        # Grading logic for Task 1 (Prioritization)
-        # Did the agent prioritize effectively? (action 0 is prioritize)
-        prioritize_count = sum(1 for step in trajectory if step.get('action', {}).get('action_type') == 0)
-        
-        if len(trajectory) == 0:
-            final_score = 0.1
+        # Optimal sequence of indices for Task 1 Prioritization: 0, 2, 3, 1, 4
+        optimal_order = [0, 2, 3, 1, 4]
+        agent_order = []
+        for step in trajectory:
+            act = step.get('action', {})
+            if act.get('action_type') == 0:
+                agent_order.append(int(act.get('value', 0)))
+                
+        # Calculate matching score against optimal length prefix
+        matches = 0
+        for i, val in enumerate(agent_order):
+            if i < len(optimal_order) and val == optimal_order[i]:
+                matches += 1
+                
+        if len(optimal_order) == 0:
+            raw_score = 0.5
         else:
-            final_score = prioritize_count / len(trajectory)
+            raw_score = matches / len(optimal_order)
             
-        # Ensure tight clamping
+        penalty = 0.05 * (len(trajectory) - matches) # Efficiency penalty
+        final_score = raw_score - penalty
         return max(0.0001, min(0.9999, final_score))
         
     except Exception:
-        # Failsafe for Phase 2 validation structure quirks
-        return 0.5
+        return 0.5000

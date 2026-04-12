@@ -1,5 +1,7 @@
 {
-    "id": "task4",
-    "name": "Budget Optimization",
-    "description": "Maintain balance across various channels with tight budget constraints."
+  "name": "Budget Optimization",
+  "description": "Agent must maintain perfect balance across 5 allocation channels using limited budget.",
+  "input": "State vector with 5 equal channels [0.5, 0.5, 0.5, 0.5, 0.5] and 0.5 remaining budget.",
+  "expected_output": "Distribute exactly one allocate action (2) across all 5 indices symmetrically.",
+  "evaluation_criteria": "Fractional similarity to perfect balance (1 action per index)."
 }

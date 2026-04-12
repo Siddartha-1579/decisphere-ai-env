@@ -1,5 +1,7 @@
 {
-    "id": "task5",
-    "name": "Escalation Strategy",
-    "description": "Properly escalate unresolvable tasks without overloading."
+  "name": "Escalation Strategy",
+  "description": "Agent must identify unresolvable blockages and selectively escalate.",
+  "input": "State vector with unresolvable dependencies at index 0 and 1, risk level 0.9.",
+  "expected_output": "Agent must sequentially use escalate action (4) on index 0 and 1 to mitigate total failure.",
+  "evaluation_criteria": "Deterministic check for escalation actions specifically on index 0 and 1."
 }

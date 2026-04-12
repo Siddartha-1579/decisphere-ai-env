@@ -2,18 +2,21 @@ def grade(*args, **kwargs) -> float:
     try:
         if len(args) > 0 and isinstance(args[0], str):
             return 0.5
-            
         trajectory = kwargs.get('trajectory', [])
-        
-        # Grading logic for Task 3 (Crisis Management)
-        escalate_count = sum(1 for step in trajectory if step.get('action', {}).get('action_type') == 4)
-        
-        if len(trajectory) == 0:
-            final_score = 0.3
-        else:
-            final_score = escalate_count / len(trajectory)
+        if not trajectory:
+            return 0.05
             
-        return max(0.0001, min(0.9999, final_score))
+        # Crisis management optimal action is resolving index 0 first
+        first_step = trajectory[0].get('action', {})
+        if first_step.get('action_type') == 0 and int(first_step.get('value', -1)) == 0:
+            return 0.95
         
+        # Did they resolve it later?
+        for step in trajectory:
+            act = step.get('action', {})
+            if act.get('action_type') == 0 and int(act.get('value', -1)) == 0:
+                return 0.50
+                
+        return 0.10
     except Exception:
-        return 0.5
+        return 0.5000

@@ -27,6 +27,7 @@ env = DecisionEnv()
 def read_root():
     return {"status": "ok", "message": "DeciSphere AI Benchmark Server"}
 
+@app.get("/reset")
 @app.post("/reset", response_model=ResetResponse)
 def reset_env(req: Optional[ResetRequest] = None, task_id: Optional[str] = Query(None)):
     final_task = "task1"
@@ -42,6 +43,22 @@ def reset_env(req: Optional[ResetRequest] = None, task_id: Optional[str] = Query
         
     obs = env.reset(task_id=t_id)
     return ResetResponse(observation=obs, info={"msg": "Environment reset"})
+
+@app.get("/step/{action}")
+def step_env_get(action: int, value: float = Query(0.0)):
+    obs, api_reward, done, info = env.step(action, value)
+    
+    # Run dynamic correctness explicitly for logging if needed or just bound 
+    # the info into the requested schema perfectly:
+    return {
+        "step": env.step_count,
+        "total_reward": env.total_reward,
+        "risk_level": env.risk_level,
+        "budget_remaining": env.budget_remaining,
+        "correctness": api_reward, 
+        "reward_history": env.reward_history,
+        "done": done
+    }
 
 @app.post("/step", response_model=StepResponse)
 def step_env(action: Action):

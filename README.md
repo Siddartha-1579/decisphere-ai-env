@@ -1,72 +1,264 @@
 ---
 title: DeciSphere AI
-emoji: 🤖
+emoji: 🧠
 colorFrom: indigo
 colorTo: blue
 sdk: docker
-sdk_version: "latest"
 pinned: false
 ---
 
-# 🧠 DeciSphere AI — DecisionEnv
+# 🧠 DeciSphere AI — Multi-Domain Decision Intelligence Benchmark
 
-A **Multi-Domain AI Decision-Making Benchmark Environment** built for the  
-**Meta PyTorch Hackathon x Scaler School of Technology**.
+## 🚀 Overview
 
-This project evaluates how well AI agents make real-world decisions across:
+DeciSphere AI is a **real-world reinforcement learning benchmark environment** designed to evaluate how AI agents make **enterprise-level decisions** under constraints.
 
-- Task Prioritization
-- Resource Allocation
-- Risk Management
-- Crisis Handling
+Unlike game-based RL environments, this system simulates **practical decision-making scenarios** focusing heavily on **Cascading Risk / Sequential Planning**. It tests an agent's ability to foresee downstream failure points such as:
 
----
-
-## 🚀 Project Overview
-
-DeciSphere AI is a **production-grade reinforcement learning environment** designed to simulate enterprise decision-making scenarios.
-
-Agents interact with the environment by choosing actions such as:
-
-- `prioritize`
-- `delay`
-- `allocate`
-- `ignore`
-- `escalate`
-
-The environment dynamically updates:
-
-- Risk levels
-- Budget constraints
-- Task queues
-- Time pressure
+* task prioritization
+* resource allocation
+* cascading risk management
+* budget optimization
+* time-sensitive workflows
+* escalation strategies
 
 ---
 
-## ⚙️ Environment API
+## 🎯 Objective
 
-The backend exposes a simple REST API:
+The goal is to build a **deterministic, reproducible evaluation environment** where AI agents are scored based on:
 
-### Reset Environment
-`POST /reset?task_id=task1`
-Resets the environment constraints safely formatted to OpenEnv specifications.
+* correctness of decisions
+* efficiency (steps taken)
+* risk management
+* overall decision quality
 
-### Step Environment
-`POST /step`
-Payload contains:
-```json
-{
-  "action_type": 1,
-  "value": 1.0
-}
+---
+
+## 🧩 Environment Design
+
+The environment follows a Gym-like structure:
+
+```python
+reset() → initializes environment
+step(action) → applies action
+state() → returns current state
+```
+
+### 🔢 Action Space
+
+Discrete actions:
+
+| ID | Action     |
+| -- | ---------- |
+| 0  | prioritize |
+| 1  | delay      |
+| 2  | allocate   |
+| 3  | ignore     |
+| 4  | escalate   |
+
+---
+
+## 📊 State Representation
+
+The environment returns a **fixed-length normalized numeric vector (~20 features)** including:
+
+* task urgency & importance
+* resource availability
+* budget remaining
+* risk level
+* time remaining
+* escalation count
+* task queue signals
+
+All values are normalized between **0 and 1**.
+
+---
+
+## 🧠 Tasks (Deterministic)
+
+### ✅ Task 1 — Task Prioritization (Easy)
+
+* Input: tasks with urgency & importance scores
+* Rule: deterministic ranking using urgency × importance
+* Goal: select optimal priority order
+
+---
+
+### ⚙️ Task 2 — Resource Allocation (Medium)
+
+* Input: budget + project list (cost, value)
+* Rule: knapsack-like optimal allocation
+* Goal: maximize total value under constraints
+
+---
+
+### 🔥 Task 3 — Crisis Management (Hard)
+
+* Input: dependency graph + cascading risk
+* Rule: deterministic resolution sequence
+* Goal: minimize global risk while resolving dependencies
+
+---
+
+## 🧮 Grading System
+
+Each task uses a **deterministic programmatic grader**.
+
+Scores are computed using:
+
+* correctness
+* efficiency
+* decision quality
+* risk handling
+
+### ⚠️ IMPORTANT
+
+All scores are **strictly bounded within (0, 1)**:
+
+```python
+score = max(0.0001, min(0.9999, score))
+```
+
+This ensures full compatibility with OpenEnv validation.
+
+---
+
+## 🎯 Reward System
+
+Rewards are:
+
+* normalized
+* deterministic
+* strictly between (0,1)
+
+Includes:
+
+* correctness reward
+* efficiency bonus
+* risk penalty
+* delay penalty
+* escalation penalty
+
+---
+
+## 🌐 API Endpoints
+
+Backend is powered by FastAPI:
+
+### 🔹 Reset Environment
+
+```bash
+GET /reset
+```
+
+### 🔹 Take Action
+
+```bash
+GET /step/{action}
+```
+
+### 🔹 Health Check
+
+```bash
+GET /
 ```
 
 ---
 
-## 🛠️ Setup and Usage
-1. `pip install -r requirements.txt`
-2. Start Server: `python -m uvicorn server.app:app`
-3. Run inference baseline: `python inference.py`
+## 📦 Project Structure
 
-## 🛡️ Validation Checking
-We implemented highly defensive grader architectures capable of resolving OpenEnv strict validation string tests reliably while cleanly outputting constrained scores bounded strictly between `[0.0001 - 0.9999]`.
+```
+decision-env/
+├── environment.py
+├── grader.py
+├── agent.py
+├── inference.py
+├── openenv.yaml
+├── Dockerfile
+├── requirements.txt
+├── server/
+│   └── app.py
+├── tasks/
+│   ├── task1/
+│   ├── task2/
+│   └── task3/
+```
+
+---
+
+## 🧪 Inference
+
+The project includes an `inference.py` script that:
+
+* interacts with the environment
+* simulates agent decisions
+* logs execution in structured format
+
+```
+[START]
+[STEP]
+[END]
+```
+
+---
+
+## 🧰 Deployment
+
+### ▶️ Run Locally
+
+Backend:
+
+```bash
+cd server
+uvicorn app:app --reload --port 7860
+```
+
+---
+
+### 🤗 Hugging Face Spaces
+
+This project is deployed using:
+
+* **SDK:** Docker
+* **Entry:** Dockerfile
+
+---
+
+## 🏆 Benchmark Goal
+
+DeciSphere AI serves as a **scalable evaluation platform** for:
+
+* RL agents
+* rule-based systems
+* LLM-based decision agents
+
+It provides a **real-world benchmark** for measuring AI decision intelligence.
+
+---
+
+## 📌 Key Highlights
+
+✅ Deterministic environment
+✅ Multi-domain decision tasks
+✅ Programmatic grading
+✅ Validator-safe scoring
+✅ API-based interaction
+✅ Production-ready design
+
+---
+
+## 🔥 Final Note
+
+This project is designed to feel like a **real enterprise AI benchmarking system**, not just a prototype.
+
+It emphasizes:
+
+* reliability
+* reproducibility
+* clarity
+* real-world applicability
+
+---
+
+🚀 Built for the **Meta × Hugging Face OpenEnv Hackathon**

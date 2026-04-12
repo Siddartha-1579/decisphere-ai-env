@@ -1,5 +1,7 @@
 {
-    "id": "task3",
-    "name": "Crisis Management",
-    "description": "Resolve dependencies and manage global risk during a crisis."
+  "name": "Crisis Management",
+  "description": "Agent must sequentially resolve a dependency graph avoiding cascading failure.",
+  "input": "State vector showing 5 risk nodes, where the root causes systemic failure.",
+  "expected_output": "Agent chooses action 0 (prioritize) specifically on the root dependency (index 0) to mitigate systemic risk immediately.",
+  "evaluation_criteria": "Deterministic check if the root node (index 0) was resolved in the first allowed step."
 }

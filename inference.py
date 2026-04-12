@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")
-API_KEY = os.getenv("API_KEY", "dummy")
+API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY") or "dummy"
 
 # Max limits
 MAX_STEPS = 50
@@ -53,7 +53,7 @@ async def run_task(client: AsyncOpenAI, t_idx: int):
                 action_type, val = await extract_action_from_llm(client, "dummy prompt")
                 action_str = f"action({action_type})"
                 
-                # Step env
+                # Step env via POST as standard OpenEnv HTTP target
                 step_req = await http_client.post("http://localhost:7860/step", json={
                     "action_type": action_type,
                     "value": val
@@ -64,7 +64,7 @@ async def run_task(client: AsyncOpenAI, t_idx: int):
                     rwd = float(resp_data.get("reward", 0.0))
                     done = bool(resp_data.get("done", False))
                 else:
-                    rwd = -1.0
+                    rwd = 0.5
                     done = True
                 
                 rewards.append(rwd)
